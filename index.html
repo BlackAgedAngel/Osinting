@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Osinting</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>OSINT Person Search</h2>
+        <form id="osintForm">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" placeholder="Enter person's full name" aria-label="Full Name">
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Enter known username(s)" aria-label="Username">
+
+            <button type="submit" id="searchButton">Search & Investigate</button>
+        </form>
+
+        <div class="results" id="results"></div>
+    </div>
+    <script>
+        document.getElementById('osintForm').addEventListener('submit', startSearch);
+
+        async function startSearch(event) {
+            if (event) event.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const username = document.getElementById('username').value.trim();
+            // Only use name and username for lookups
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<em>Generating OSINT investigation links...</em>';
+            if (!name && !username) {
+                alert('Please fill in at least a name or username.');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            // Google dorking links
+            let html = '<h3>Google Dorking Links</h3>';
+            if (name) {
+                html += `<strong>Name:</strong> `;
+                html += [
+                    `<a href="https://www.google.com/search?q=\"${encodeURIComponent(name)}\"" target="_blank" title="Exact name search">Exact</a>`,
+                    `<a href="https://www.google.com/search?q=intitle:%22${encodeURIComponent(name)}%22" target="_blank" title="intitle dork">intitle</a>`,
+                    `<a href="https://www.google.com/search?q=intext:%22${encodeURIComponent(name)}%22" target="_blank" title="intext dork">intext</a>`,
+                    `<a href="https://www.google.com/search?q=site:linkedin.com+%22${encodeURIComponent(name)}%22" target="_blank" title="LinkedIn site dork">site:linkedin</a>`
+                ].join(' | ');
+                html += '<br/>';
+            }
+            if (username) {
+                html += `<strong>Username:</strong> `;
+                html += [
+                    `<a href="https://www.google.com/search?q=\"${encodeURIComponent(username)}\"" target="_blank" title="Exact username search">Exact</a>`,
+                    `<a href="https://www.google.com/search?q=inurl:%22${encodeURIComponent(username)}%22" target="_blank" title="inurl dork">inurl</a>`,
+                    `<a href="https://www.google.com/search?q=intitle:%22${encodeURIComponent(username)}%22" target="_blank" title="intitle dork">intitle</a>`,
+                    `<a href="https://www.google.com/search?q=intext:%22${encodeURIComponent(username)}%22" target="_blank" title="intext dork">intext</a>`,
+                    `<a href="https://www.google.com/search?q=site:github.com+%22${encodeURIComponent(username)}%22" target="_blank" title="GitHub site dork">site:github</a>`
+                ].join(' | ');
+                html += '<br/>';
+            }
+            // Other OSINT links (no email/phone)
+            html += '<h3>Other OSINT Links</h3>';
+            if (name) {
+                html += `<strong>Name:</strong> `;
+                html += [
+                    `<a href="https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(name)}" target="_blank" title="Search LinkedIn">LinkedIn</a>`
+                ].join(' | ');
+                html += '<br/>';
+            }
+            if (username) {
+                html += `<strong>Username:</strong> `;
+                html += [
+                    `<a href="https://github.com/${encodeURIComponent(username)}" target="_blank" title="Check username on GitHub">GitHub</a>`,
+                    `<a href="https://twitter.com/${encodeURIComponent(username)}" target="_blank" title="Check username on Twitter">Twitter</a>`,
+                    `<a href="https://instagram.com/${encodeURIComponent(username)}" target="_blank" title="Check username on Instagram">Instagram</a>`,
+                    `<a href="https://namechk.com/${encodeURIComponent(username)}" target="_blank" title="Check username on Namechk">Namechk</a>`
+                ].join(' | ');
+                html += '<br/>';
+            }
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
